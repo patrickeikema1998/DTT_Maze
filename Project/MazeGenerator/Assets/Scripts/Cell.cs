@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cell : MonoBehaviour
+public class Cell
 {
     //top, right, bottom, left (clockwards)
     public bool[] walls = { true, true, true, true };
