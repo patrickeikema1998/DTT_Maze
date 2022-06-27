@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class MazeGenerator : MonoBehaviour
 {
-    [SerializeField] [Range(10, 250)] private int columnCount, rowCount;
+    private int columnCount, rowCount;
     [SerializeField] Tilemap tilemap;
     [SerializeField] Tile[] tiles;
     private List<Cell> gridCells = new List<Cell>();
@@ -14,7 +14,7 @@ public class MazeGenerator : MonoBehaviour
 
     void Start()
     {
-        GenerateMaze();
+        GenerateMaze(10,10);
     }
 
     void Update()
@@ -22,9 +22,12 @@ public class MazeGenerator : MonoBehaviour
 
     }
 
-    private void GenerateMaze()
+    public void GenerateMaze(int totalRows, int totalColumns)
     {
-        FillGrid();
+        columnCount = totalColumns;
+        rowCount = totalRows;
+
+        FillGrid(totalRows, totalColumns);
         while (true)
         {
             MazeAlgorithm();
@@ -60,11 +63,14 @@ public class MazeGenerator : MonoBehaviour
     }
 
     //fills the list with cells. Each cell gets a column- and rownumber for placements and algorithm.
-    private void FillGrid()
+    private void FillGrid(int totalRows, int totalColumns)
     {
-        for (int row = 0; row < rowCount; row++)
+        //for re-generating.
+        gridCells.Clear();
+
+        for (int row = 0; row < totalRows; row++)
         {
-            for (int column = 0; column < columnCount; column++)
+            for (int column = 0; column < totalColumns; column++)
             {
                 Cell cell = new Cell(row, column);
                 gridCells.Add(cell);
