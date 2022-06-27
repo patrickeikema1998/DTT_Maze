@@ -57,7 +57,7 @@ public class MazeGenerator : MonoBehaviour
         {
             next.visited = true;
             stack.Push(current);
-            RemoveWalls(current, next);
+            SetWallsToFalse(current, next);
             current = next;
             next = CheckNextNeighbor(current);
         }
@@ -85,7 +85,7 @@ public class MazeGenerator : MonoBehaviour
         current = gridCells[0];
     }
     //if you multiply the rownumber by the amount of columns, you get the index of the first cell in that rownumber. if you add the column number to that, you get the right index.
-    private int Index(int objectRow, int objectColumn)
+    private int GetIndex(int objectRow, int objectColumn)
     {
         if (objectColumn < 0 || objectRow < 0 || objectColumn >= columnCount || objectRow >= rowCount) return -1;
         return objectRow * columnCount + objectColumn;
@@ -93,15 +93,15 @@ public class MazeGenerator : MonoBehaviour
 
 
     //this function returns a random neighbor.
-    private Cell CheckNextNeighbor(Cell cell)
+    private Cell CheckNextNeighbor(Cell currentCell)
     {
         List<Cell> neighbors = new List<Cell>();
 
         //neighbor indexes
-        int topNeighborIndex = Index(cell.rowNumber - 1, cell.columnNumber);
-        int bottomNeighborIndex = Index(cell.rowNumber + 1, cell.columnNumber);
-        int leftNeighborIndex = Index(cell.rowNumber, cell.columnNumber - 1);
-        int rightNeighborIndex = Index(cell.rowNumber, cell.columnNumber + 1);
+        int topNeighborIndex = GetIndex(currentCell.rowNumber - 1, currentCell.columnNumber);
+        int bottomNeighborIndex = GetIndex(currentCell.rowNumber + 1, currentCell.columnNumber);
+        int leftNeighborIndex = GetIndex(currentCell.rowNumber, currentCell.columnNumber - 1);
+        int rightNeighborIndex = GetIndex(currentCell.rowNumber, currentCell.columnNumber + 1);
 
         //adds neighbors to list if found and not visited.
         if (topNeighborIndex != -1)
@@ -138,7 +138,7 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    private void RemoveWalls(Cell current, Cell next)
+    private void SetWallsToFalse(Cell current, Cell next)
     {
         float columnDifference = current.columnNumber - next.columnNumber;
 
@@ -175,7 +175,7 @@ public class MazeGenerator : MonoBehaviour
     //this function places the tiles accordingly to the false booleans per cell. 1000 means [true, false, false, false].
     private void DecideAndPlaceTile(Cell cell)
     {
-        switch (makeSuitableForSwitch(cell.walls))
+        switch (MakeSuitableForSwitch(cell.walls))
         {
             case 0111:
                 //top wall missing
@@ -243,7 +243,7 @@ public class MazeGenerator : MonoBehaviour
     }
 
     //boolean arrays are not allowed in switches. This is why the array is calculated into binary.
-    private int makeSuitableForSwitch(bool[] values)
+    private int MakeSuitableForSwitch(bool[] values)
     {
         return (values[0] ? 1 : 0) * 1000 + (values[1] ? 1 : 0) * 100 + (values[2] ? 1 : 0) * 10 + (values[3] ? 1 : 0);
     }

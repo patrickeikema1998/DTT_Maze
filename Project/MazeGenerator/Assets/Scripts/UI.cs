@@ -22,7 +22,6 @@ public class UI : MonoBehaviour
     {
         onGenerateMaze += CreateMaze;
         onSliderValueChanged += UpdateSliderText;
-
         //UI listeners
         generateButton.onClick.AddListener(onGenerateMaze);
         columnsSlider.onValueChanged.AddListener(delegate { onSliderValueChanged(columnsSlider, columnsText); });
@@ -37,7 +36,9 @@ public class UI : MonoBehaviour
 
     private void CreateMaze()
     {
+        //for re-use
         tilemap.ClearAllTiles();
+
         mazeGenerator.GenerateMaze((int)rowsSlider.value, (int)columnsSlider.value);
     }
 }

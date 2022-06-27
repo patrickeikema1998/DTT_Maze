@@ -25,12 +25,12 @@ public class CameraBehavior : MonoBehaviour
         //scales the size of the camera to the size of the maze
         if ((float)rowCount * 1.77f >= (float)columnCount)
         {
-             cam.orthographicSize = rowCount / 2 + 1;
+             cam.orthographicSize = rowCount / 2 + 1; //+ 1 to give a little extra space
 
         }
         else
         {
-            cam.orthographicSize = Mathf.Round(columnCount / (1.77f * 2)) + 1;
+            cam.orthographicSize = Mathf.Round(columnCount / (1.77f * 2)) + 1; //+ 1 to give a little extra space
         }
     }
 }
