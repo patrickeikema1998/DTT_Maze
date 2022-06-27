@@ -26,7 +26,7 @@ public class CameraBehavior : MonoBehaviour
         transform.position = new Vector3(camPos.x, camPos.y, transform.position.z);
 
         //size of camera.
-        if ((float)columnCount * 1.77f >= (float)columnCount)
+        if ((float)rowCount * 1.77f >= (float)columnCount)
         {
              cam.orthographicSize = rowCount / 2 + 1;
 

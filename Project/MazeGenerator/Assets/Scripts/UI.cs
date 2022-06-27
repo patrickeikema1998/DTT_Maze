@@ -38,6 +38,6 @@ public class UI : MonoBehaviour
     private void CreateMaze()
     {
         tilemap.ClearAllTiles();
-        mazeGenerator.GenerateMaze((int)columnsSlider.value, (int)columnsSlider.value);
+        mazeGenerator.GenerateMaze((int)rowsSlider.value, (int)columnsSlider.value);
     }
 }

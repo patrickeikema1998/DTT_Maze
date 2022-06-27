@@ -27,12 +27,12 @@ public class MazeGenerator : MonoBehaviour
 
     }
 
-    public void GenerateMaze(int totalRows, int totalColumns)
+    public void GenerateMaze(int rowAmount, int columnAmount)
     {
-        columnCount = totalColumns;
-        rowCount = totalRows;
+        columnCount = columnAmount;
+        rowCount = rowAmount;
 
-        FillGrid(totalRows, totalColumns);
+        FillGrid(rowAmount, columnAmount);
         while (true)
         {
             MazeAlgorithm();
@@ -40,7 +40,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 for (int i = 0; i < gridCells.Count; i++)
                 {
-                    PlaceTileForCell(gridCells[i]);
+                    DecideAndPlaceTile(gridCells[i]);
                 }
                 cameraBehavior.CenterAndScaleCamToMaze(rowCount, columnCount);
                 break;
@@ -173,7 +173,7 @@ public class MazeGenerator : MonoBehaviour
 
 
     //this function places the tiles accordingly to the false booleans per cell. 1000 means [true, false, false, false].
-    private void PlaceTileForCell(Cell cell)
+    private void DecideAndPlaceTile(Cell cell)
     {
         switch (makeSuitableForSwitch(cell.walls))
         {
