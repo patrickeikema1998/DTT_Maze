@@ -12,8 +12,13 @@ public class MazeGenerator : MonoBehaviour
     private Stack<Cell> stack = new Stack<Cell>();
     private Cell current, next;
 
+    Camera cam;
+    CameraBehavior cameraBehavior;
+
     void Start()
     {
+        cam = Camera.main;
+        cameraBehavior = cam.GetComponent<CameraBehavior>();
         GenerateMaze(10,10);
     }
 
@@ -37,6 +42,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     PlaceTileForCell(gridCells[i]);
                 }
+                cameraBehavior.CenterAndScaleCamToMaze(rowCount, columnCount);
                 break;
             }
         }
@@ -226,6 +232,10 @@ public class MazeGenerator : MonoBehaviour
             case 0001:
                 //top, right and bottom wall missing
                 tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[13]);
+                break;
+            case 0000:
+                //top, right, bottom and left wall missing
+                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[14]);
                 break;
 
 
