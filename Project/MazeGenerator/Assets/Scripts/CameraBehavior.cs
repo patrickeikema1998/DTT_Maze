@@ -19,13 +19,10 @@ public class CameraBehavior : MonoBehaviour
 
     public void CenterAndScaleCamToMaze(int rowCount, int columnCount)
     {
-        Vector2 camPos = new Vector2();
+        //sets camera to center of maze
+        transform.position = new Vector3((float)columnCount/2, (float)rowCount/2, transform.position.z);
 
-        camPos.x = columnCount / 2;
-        camPos.y = rowCount / 2;
-        transform.position = new Vector3(camPos.x, camPos.y, transform.position.z);
-
-        //size of camera.
+        //scales the size of the camera to the size of the maze
         if ((float)rowCount * 1.77f >= (float)columnCount)
         {
              cam.orthographicSize = rowCount / 2 + 1;
