@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    GameObject player;
-    Rigidbody2D body;
     int cellLenght = 1;
 
     // Start is called before the first frame update
     void Start()
     {
-        player = this.gameObject;
-        body = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
@@ -20,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleMovement();
     }
+
+    //moves player to direction if it wil hit no walls
     private void HandleMovement() {
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -43,7 +41,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
+    //checks if there are colliders in the direction given within cellLength.
     private bool CanMove(Vector2 direction)
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, cellLenght);

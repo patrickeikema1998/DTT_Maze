@@ -11,18 +11,31 @@ public class MazeGenerator : MonoBehaviour
     private List<Cell> gridCells = new List<Cell>();
     private Stack<Cell> stack = new Stack<Cell>();
     private Cell current, next;
+    [SerializeField] GameObject player;
+    [SerializeField] GameObject finish;
+    float cellLength = 0.5f;
 
     CameraBehavior cameraBehavior;
 
-    void Start()
+    public int ColumnCount
     {
-        cameraBehavior = Camera.main.GetComponent<CameraBehavior>();
-        GenerateMaze(10,10);
+        get { return columnCount; }
     }
 
-    void Update()
+    public int RowCount
     {
+        get { return rowCount; }
+    }
 
+
+    void Start()
+    {
+        GenerateMaze(10, 10);
+    }
+
+    private void Awake()
+    {
+        cameraBehavior = Camera.main.GetComponent<CameraBehavior>();
     }
 
     public void GenerateMaze(int rowAmount, int columnAmount)
@@ -40,7 +53,10 @@ public class MazeGenerator : MonoBehaviour
                 {
                     DecideAndPlaceTile(gridCells[i]);
                 }
-                if(cameraBehavior)cameraBehavior.CenterAndScaleCamToMaze(rowCount, columnCount);
+                if (cameraBehavior)
+                {
+                    cameraBehavior.CenterAndScaleCamToMaze(rowCount, columnCount);
+                }
                 break;
             }
         }
@@ -81,7 +97,11 @@ public class MazeGenerator : MonoBehaviour
             }
         }
         current = gridCells[0];
+        player.transform.position = new Vector2((current.columnNumber / 2f) + cellLength, (current.columnNumber / 2f) + cellLength); //sets player pos to start of maze
+        finish.transform.position = new Vector2(gridCells[gridCells.Count -1].columnNumber + cellLength, gridCells[gridCells.Count-1].rowNumber + cellLength);
     }
+
+
     //if you multiply the rownumber by the amount of columns, you get the index of the first cell in that rownumber. if you add the column number to that, you get the right index.
     private int GetIndex(int objectRow, int objectColumn)
     {
