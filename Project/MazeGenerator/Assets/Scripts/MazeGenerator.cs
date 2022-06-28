@@ -12,13 +12,11 @@ public class MazeGenerator : MonoBehaviour
     private Stack<Cell> stack = new Stack<Cell>();
     private Cell current, next;
 
-    Camera cam;
     CameraBehavior cameraBehavior;
 
     void Start()
     {
-        cam = Camera.main;
-        cameraBehavior = cam.GetComponent<CameraBehavior>();
+        cameraBehavior = Camera.main.GetComponent<CameraBehavior>();
         GenerateMaze(10,10);
     }
 
@@ -42,7 +40,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     DecideAndPlaceTile(gridCells[i]);
                 }
-                cameraBehavior.CenterAndScaleCamToMaze(rowCount, columnCount);
+                if(cameraBehavior)cameraBehavior.CenterAndScaleCamToMaze(rowCount, columnCount);
                 break;
             }
         }
