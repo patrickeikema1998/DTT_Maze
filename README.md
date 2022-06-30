@@ -13,5 +13,3 @@ When at a dead-end it backtracks through the path until it reaches a cell with a
 This process continues until every cell has been visited, causing the computer to backtrack all the way back to the beginning cell. 
 We can be sure every cell is visited.
 
-# Documentation
-
