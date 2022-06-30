@@ -635,8 +635,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 749cba2349c05a34eb87f40662a209ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilemap: {fileID: 911183280}
-  tiles:
+  _tilemap: {fileID: 911183280}
+  _tiles:
   - {fileID: 11400000, guid: 383c49e7913e36b4dac64256c136286c, type: 2}
   - {fileID: 11400000, guid: dc1e418a88c68eb45bd13c6121fbd0b7, type: 2}
   - {fileID: 11400000, guid: e1c739ad6d512704881f9e8c6428652b, type: 2}
@@ -652,8 +652,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: afc5fc5eb41ba44468b24b2e32381924, type: 2}
   - {fileID: 11400000, guid: 0f77f4454bb47944fb5608e3333d9005, type: 2}
   - {fileID: 11400000, guid: 5edc8cf35f061194ebfb27131b55e053, type: 2}
-  player: {fileID: 1541809620}
-  finish: {fileID: 1217123490}
+  _player: {fileID: 1541809620}
+  _finish: {fileID: 1217123490}
 --- !u!4 &395202880
 Transform:
   m_ObjectHideFlags: 0
@@ -2156,17 +2156,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3980b47faa8d82d4c897fe4f07983aaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  columnsSlider: {fileID: 820879006}
-  rowsSlider: {fileID: 1781409282}
-  columnsText: {fileID: 1036823700}
-  rowsText: {fileID: 162176327}
-  generateButton: {fileID: 179350882}
-  seeMapButton: {fileID: 1545637525}
-  seePlayerButton: {fileID: 1905160715}
-  zoomSlider: {fileID: 8069667}
-  mazeGenerator: {fileID: 395202879}
-  tilemap: {fileID: 911183280}
-  seeMap: 0
+  _columnsSlider: {fileID: 820879006}
+  _rowsSlider: {fileID: 1781409282}
+  _columnsText: {fileID: 561720318}
+  _rowsText: {fileID: 162176327}
+  _generateButton: {fileID: 179350882}
+  _seeMapButton: {fileID: 1545637525}
+  _seePlayerButton: {fileID: 1905160715}
+  _zoomSlider: {fileID: 8069667}
+  _mazeGenerator: {fileID: 395202879}
+  _tilemap: {fileID: 911183280}
 --- !u!114 &1409860049
 MonoBehaviour:
   m_ObjectHideFlags: 0
