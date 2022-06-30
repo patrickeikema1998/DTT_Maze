@@ -5,149 +5,162 @@ using UnityEngine.Tilemaps;
 
 public class MazeGenerator : MonoBehaviour
 {
-    private int columnCount, rowCount;
-    [SerializeField] Tilemap tilemap;
-    [SerializeField] Tile[] tiles;
-    private List<Cell> gridCells = new List<Cell>();
-    private Stack<Cell> stack = new Stack<Cell>();
-    private Cell current, next;
-    [SerializeField] GameObject player;
-    [SerializeField] GameObject finish;
-    float cellLength = 0.5f;
+    public static float CellLength = 1f;
 
-    CameraBehavior cameraBehavior;
+    [SerializeField] private Tilemap _tilemap;
+    [SerializeField] private Tile[] _tiles;
+    [SerializeField] private GameObject _player;
+    [SerializeField] private GameObject _finish;
+    CameraBehavior _cameraBehavior;
 
-    public int ColumnCount
-    {
-        get { return columnCount; }
-    }
+    private int _rowCount = 10, _columnCount = 10;
+    private List<Cell> _gridCells = new List<Cell>();
+    private Stack<Cell> _stack = new Stack<Cell>();
+    private Cell _currentCell, _nextCell;
 
     public int RowCount
     {
-        get { return rowCount; }
+        get { return _rowCount; }
     }
 
+    public int ColumnCount
+    {
+        get { return _columnCount; }
+    }
 
     void Start()
     {
-        GenerateMaze(10, 10);
+        GenerateMaze(_rowCount, _columnCount);
     }
 
     private void Awake()
     {
-        cameraBehavior = Camera.main.GetComponent<CameraBehavior>();
+        _cameraBehavior = Camera.main.GetComponent<CameraBehavior>();
     }
 
+
+    // This function is called at the start and when the generate button is pressed.
+    // The grid is filled, the algorithm decides what walls should be removed and then the tiles are placed. Also the camera scales and centers to the maze.
     public void GenerateMaze(int rowAmount, int columnAmount)
     {
-        columnCount = columnAmount;
-        rowCount = rowAmount;
+        _columnCount = columnAmount;
+        _rowCount = rowAmount;
 
         FillGrid(rowAmount, columnAmount);
         while (true)
         {
             MazeAlgorithm();
-            if (stack.Count == 0)
+            if (_stack.Count == 0)
             {
-                for (int i = 0; i < gridCells.Count; i++)
+                for (int i = 0; i < _gridCells.Count; i++)
                 {
-                    DecideAndPlaceTile(gridCells[i]);
+                    DecideAndPlaceTile(_gridCells[i]);
                 }
-                if (cameraBehavior)
+                if (_cameraBehavior)
                 {
-                    cameraBehavior.CenterAndScaleCamToMaze(rowCount, columnCount);
+                    _cameraBehavior.CenterAndScaleCamToMaze(_rowCount, _columnCount);
                 }
                 break;
             }
         }
     }
 
+
+    
+      // Algorithm:
+      // Visited is set to true, so that the algorithm cant traverse back to it.
+      // The next cell is the neighbor of the current cell.
+      // While a next cell (neighbor) is found, we set next.visited to true. The current cell is pushed to the stack for traversing.The walls need to be set to false of both the current and the next cell, determined by the direction.
+      // To go through the list, we set current to the next. Now we check for the next neighbor again. If no unvisited neighbor is found, the while loop will stop, because next will be null.
+      // When the while loop stops, it means that no unvisited neighbor is found.
+      // The if statement checks to if it is not the last cell. If it is not, the current is set to the last Cell and removed from the stack. Now the algorithm will start over and over until it is the last cell.
+    
     private void MazeAlgorithm()
     {
-        current.visited = true;
-        next = CheckNextNeighbor(current);
+        _currentCell.Visited = true;
+        _nextCell = CheckNextNeighbor(_currentCell);
 
-        while(next != null)
+        while (_nextCell != null)
         {
-            next.visited = true;
-            stack.Push(current);
-            SetWallsToFalse(current, next);
-            current = next;
-            next = CheckNextNeighbor(current);
+            _nextCell.Visited = true;
+            _stack.Push(_currentCell);
+            SetWallsToFalse(_currentCell, _nextCell);
+            _currentCell = _nextCell;
+            _nextCell = CheckNextNeighbor(_currentCell);
         }
 
-        if (stack.Count > 0)
+        if (_stack.Count > 0)
         {
-            current = stack.Pop();
+            _currentCell = _stack.Pop();
         }
     }
 
-    //fills the list with cells. Each cell gets a column- and rownumber for placements and algorithm.
+    // Fills the list with cells. Each cell gets a column- and rownumber for placements and algorithm.
     private void FillGrid(int totalRows, int totalColumns)
     {
         //for re-generating.
-        gridCells.Clear();
+        _gridCells.Clear();
 
         for (int row = 0; row < totalRows; row++)
         {
             for (int column = 0; column < totalColumns; column++)
             {
                 Cell cell = new Cell(row, column);
-                gridCells.Add(cell);
+                _gridCells.Add(cell);
             }
         }
-        current = gridCells[0];
-        player.transform.position = new Vector2((current.columnNumber / 2f) + cellLength, (current.columnNumber / 2f) + cellLength); //sets player pos to start of maze
-        finish.transform.position = new Vector2(gridCells[gridCells.Count -1].columnNumber + cellLength, gridCells[gridCells.Count-1].rowNumber + cellLength);
+        _currentCell = _gridCells[0];
+        _player.transform.position = new Vector2((_currentCell.ColumnNumber / 2f) + (CellLength / 2f), (_currentCell.ColumnNumber / 2f) + (CellLength / 2f)); //sets player pos to start of maze
+        _finish.transform.position = new Vector2(_gridCells[_gridCells.Count - 1].ColumnNumber + (CellLength / 2f), _gridCells[_gridCells.Count - 1].RowNumber + (CellLength / 2f));
     }
 
 
-    //if you multiply the rownumber by the amount of columns, you get the index of the first cell in that rownumber. if you add the column number to that, you get the right index.
+    // If you multiply the rownumber by the amount of columns, you get the index of the first cell in that rownumber. if you add the column number to that, you get the right index.
     private int GetIndex(int objectRow, int objectColumn)
     {
-        if (objectColumn < 0 || objectRow < 0 || objectColumn >= columnCount || objectRow >= rowCount) return -1;
-        return objectRow * columnCount + objectColumn;
+        if (objectColumn < 0 || objectRow < 0 || objectColumn >= _columnCount || objectRow >= _rowCount) return -1;
+        return objectRow * _columnCount + objectColumn;
     }
 
 
-    //this function returns a random neighbor.
+    // This function returns a random neighbor.
     private Cell CheckNextNeighbor(Cell currentCell)
     {
         List<Cell> neighbors = new List<Cell>();
 
-        //neighbor indexes
-        int topNeighborIndex = GetIndex(currentCell.rowNumber - 1, currentCell.columnNumber);
-        int bottomNeighborIndex = GetIndex(currentCell.rowNumber + 1, currentCell.columnNumber);
-        int leftNeighborIndex = GetIndex(currentCell.rowNumber, currentCell.columnNumber - 1);
-        int rightNeighborIndex = GetIndex(currentCell.rowNumber, currentCell.columnNumber + 1);
+        // Neighbor indexes.
+        int topNeighborIndex = GetIndex(currentCell.RowNumber - 1, currentCell.ColumnNumber);
+        int bottomNeighborIndex = GetIndex(currentCell.RowNumber + 1, currentCell.ColumnNumber);
+        int leftNeighborIndex = GetIndex(currentCell.RowNumber, currentCell.ColumnNumber - 1);
+        int rightNeighborIndex = GetIndex(currentCell.RowNumber, currentCell.ColumnNumber + 1);
 
-        //adds neighbors to list if found and not visited.
+        // Adds neighbors to list if found and not visited.
         if (topNeighborIndex != -1)
         {
-            var top = gridCells[topNeighborIndex];
-            if (!top.visited) neighbors.Add(top);
+            Cell top = _gridCells[topNeighborIndex];
+            if (!top.Visited) neighbors.Add(top);
         }
         if (rightNeighborIndex != -1)
         {
-            var right = gridCells[rightNeighborIndex];
-            if (!right.visited) neighbors.Add(right);
+            Cell right = _gridCells[rightNeighborIndex];
+            if (!right.Visited) neighbors.Add(right);
         }
 
         if (bottomNeighborIndex != -1)
         {
-            var bottom = gridCells[bottomNeighborIndex];
-            if (!bottom.visited) neighbors.Add(bottom);
+            Cell bottom = _gridCells[bottomNeighborIndex];
+            if (!bottom.Visited) neighbors.Add(bottom);
         }
         if (leftNeighborIndex != -1)
         {
-            var left = gridCells[leftNeighborIndex];
-            if (!left.visited) neighbors.Add(left);
+            Cell left = _gridCells[leftNeighborIndex];
+            if (!left.Visited) neighbors.Add(left);
 
         }
-        //returns random neighbor
+        // Returns random neighbor.
         if (neighbors.Count > 0)
         {
-            var randomNeighbor = neighbors[Random.Range(0, neighbors.Count)];
+            Cell randomNeighbor = neighbors[Random.Range(0, neighbors.Count)];
             return randomNeighbor;
         }
         else
@@ -158,34 +171,34 @@ public class MazeGenerator : MonoBehaviour
 
     private void SetWallsToFalse(Cell current, Cell next)
     {
-        float columnDifference = current.columnNumber - next.columnNumber;
+        float columnDifference = current.ColumnNumber - next.ColumnNumber;
 
-        //right side of current
+        // Right side of current.
         if (columnDifference == 1)
         {
-            current.walls[3] = false;
-            next.walls[1] = false;
+            current.Walls[3] = false;
+            next.Walls[1] = false;
         }
-        //left side of current
+        // Left side of current.
         else if (columnDifference == -1)
         {
-            current.walls[1] = false;
-            next.walls[3] = false;
+            current.Walls[1] = false;
+            next.Walls[3] = false;
         }
 
-        float rowDifference = current.rowNumber - next.rowNumber;
+        float rowDifference = current.RowNumber - next.RowNumber;
 
-        // bottom side of current
+        // Bottom side of current.
         if (rowDifference == 1)
         {
-            current.walls[2] = false;
-            next.walls[0] = false;
+            current.Walls[2] = false;
+            next.Walls[0] = false;
         }
-        //top side of current
+        // Top side of current.
         else if (rowDifference == -1)
         {
-            current.walls[0] = false;
-            next.walls[2] = false;
+            current.Walls[0] = false;
+            next.Walls[2] = false;
         }
     }
 
@@ -193,67 +206,67 @@ public class MazeGenerator : MonoBehaviour
     //this function places the tiles accordingly to the false booleans per cell. 1000 means [true, false, false, false].
     private void DecideAndPlaceTile(Cell cell)
     {
-        switch (MakeSuitableForSwitch(cell.walls))
+        switch (MakeSuitableForSwitch(cell.Walls))
         {
             case 0111:
                 //top wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[0]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[0]);
                 break;
             case 1011:
                 //right wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[1]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[1]);
                 break;
             case 1101:
                 //bottom wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[2]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[2]);
                 break;
             case 1110:
                 //left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[3]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[3]);
                 break;
             case 1100:
                 //bottom and left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[4]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[4]);
                 break;
             case 0110:
                 //top and left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[5]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[5]);
                 break;
             case 0011:
                 //top and right wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[6]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[6]);
                 break;
             case 1001:
                 //right and bottom wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[7]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[7]);
                 break;
             case 0101:
                 //top and bottom wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[8]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[8]);
                 break;
             case 1010:
                 //right and left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[9]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[9]);
                 break;
             case 1000:
                 //right, bottom and left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[10]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[10]);
                 break;
             case 0100:
                 //top, bottom and left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[11]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[11]);
                 break;
             case 0010:
                 //top, right and left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[12]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[12]);
                 break;
             case 0001:
                 //top, right and bottom wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[13]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[13]);
                 break;
             case 0000:
                 //top, right, bottom and left wall missing
-                tilemap.SetTile(new Vector3Int(cell.columnNumber, cell.rowNumber, 0), tiles[14]);
+                _tilemap.SetTile(new Vector3Int(cell.ColumnNumber, cell.RowNumber, 0), _tiles[14]);
                 break;
 
 

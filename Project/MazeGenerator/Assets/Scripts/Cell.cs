@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class Cell
 {
-    //top, right, bottom, left (clockwards)
-    public bool[] walls = { true, true, true, true };
-    public bool visited = false;
-    public int columnNumber, rowNumber;
+    // Top, right, bottom, left (clockwards).
+    public bool[] Walls = { true, true, true, true };
+
+    public bool Visited = false;
+    public int ColumnNumber, RowNumber;
     public Cell(int rowNumber, int columnNumber)
     {
-        this.rowNumber = rowNumber;
-        this.columnNumber = columnNumber;
+        this.RowNumber = rowNumber;
+        this.ColumnNumber = columnNumber;
     }
 }

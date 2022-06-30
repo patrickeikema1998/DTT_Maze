@@ -4,23 +4,17 @@ using UnityEngine;
 
 public class CameraBehavior : MonoBehaviour
 {
-    float startOrtographicSize;
-    Camera cam;
     [SerializeField] GameObject player;
     [SerializeField] GameObject uiCanvas;
     UI ui;
+    Camera cam;
 
-    float cameraLerpSpeed = 2f;
-    // Start is called before the first frame update
-    void Start()
-    {
+    private float _fullOrtographicSize;
+    private float _cameraLerpSpeed = 2f;
 
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        if (!ui.seeMap) MoveTowardsPlayer();
+        if (!ui.SeeMap) MoveCamTowardsPlayer();
     }
 
     private void Awake()
@@ -29,35 +23,38 @@ public class CameraBehavior : MonoBehaviour
         ui = uiCanvas.GetComponent<UI>();
     }
 
-    private void MoveTowardsPlayer()
+    // This function will move the camera smoothly towards the player. Increase lerp speed to increase the speed of the camera.
+    private void MoveCamTowardsPlayer()
     {
-        float wantedPosX = Mathf.Lerp(cam.transform.position.x, player.transform.position.x, cameraLerpSpeed * Time.deltaTime);
-        float wantedPosY = Mathf.Lerp(cam.gameObject.transform.position.y, player.gameObject.transform.position.y, cameraLerpSpeed * Time.deltaTime);
+        float wantedPosX = Mathf.Lerp(cam.transform.position.x, player.transform.position.x, _cameraLerpSpeed * Time.deltaTime);
+        float wantedPosY = Mathf.Lerp(cam.gameObject.transform.position.y, player.gameObject.transform.position.y, _cameraLerpSpeed * Time.deltaTime);
         cam.transform.position = new Vector3(wantedPosX, wantedPosY, cam.transform.position.z);
     }
 
     public void CenterAndScaleCamToMaze(int rowCount, int columnCount)
     {
-        //sets camera to center of maze
-        transform.position = new Vector3((float)columnCount/2, (float)rowCount/2, transform.position.z);
+        // Sets camera to center of maze.
+        transform.position = new Vector3((float)columnCount / 2, (float)rowCount / 2, transform.position.z);
 
-        //scales the size of the camera to the size of the maze
-        if ((float)rowCount * 1.77f >= (float)columnCount)
+        // Scales the size of the camera to the size of the maze.
+        float multiplier = 1.77f;
+        if ((float)rowCount * multiplier >= (float)columnCount)
         {
-             cam.orthographicSize = rowCount / 2 + 1; //+ 1 to give a little extra space
+            cam.orthographicSize = rowCount / 2 + 1; //+ 1 to give a little extra space
         }
         else
         {
-            cam.orthographicSize = Mathf.Round(columnCount / (1.77f * 2)) + 1; //+ 1 to give a little extra space
+            cam.orthographicSize = Mathf.Round(columnCount / (multiplier * 2)) + 1; //+ 1 to give a little extra space
         }
 
-        startOrtographicSize = cam.orthographicSize;
+        // Used for zoom behavior.
+        _fullOrtographicSize = cam.orthographicSize;
     }
 
+    // The slider can zoom in with x10 max zoom. 
     public void ZoomBehavior(float zoomMultiplier)
     {
-        Debug.Log(startOrtographicSize);
-        if (startOrtographicSize != 0) cam.orthographicSize = startOrtographicSize * zoomMultiplier;
+        if (_fullOrtographicSize != 0) cam.orthographicSize = _fullOrtographicSize * zoomMultiplier;
     }
 
 }

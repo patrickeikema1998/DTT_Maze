@@ -7,62 +7,68 @@ using UnityEngine.Events;
 
 public class UI : MonoBehaviour
 {
-    [SerializeField] Slider columnsSlider;
-    [SerializeField] Slider rowsSlider;
-    [SerializeField] Text columnsText;
-    [SerializeField] Text rowsText;
-    [SerializeField] Button generateButton;
-    [SerializeField] Button seeMapButton;
-    [SerializeField] Button seePlayerButton;
-    [SerializeField] Slider zoomSlider;
-    [SerializeField] MazeGenerator mazeGenerator;
-    [SerializeField] Tilemap tilemap;
+    [SerializeField] private Slider _columnsSlider;
+    [SerializeField] private Slider _rowsSlider;
+    [SerializeField] private Text _columnsText;
+    [SerializeField] private Text _rowsText;
+    [SerializeField] private Button _generateButton;
+    [SerializeField] private Button _seeMapButton;
+    [SerializeField] private Button _seePlayerButton;
+    [SerializeField] private Slider _zoomSlider;
+    [SerializeField] private MazeGenerator _mazeGenerator;
+    [SerializeField] private Tilemap _tilemap;
+    private Camera _cam;
+    private CameraBehavior _camBehavior;
 
-    private UnityAction onGenerateMaze;
-    private UnityAction<Slider, Text> onGridSliderValueChanged;
-    private UnityAction<float> onZoomSliderValueChanged;
+    private UnityAction _onGenerateMaze;
+    private UnityAction<Slider, Text> _onGridSliderValueChanged;
+    private UnityAction<float> _onZoomSliderValueChanged;
 
-    public bool seeMap = false;
+    private bool _seeMap = false;
 
-    int mazeColumns = 10, mazeRows = 10;
+    public bool SeeMap
+    {
+        get { return _seeMap; }
+    }
 
-    Camera cam;
-    CameraBehavior camBehavior;
-    // Start is called before the first frame update
+
     void Start()
     {
-        cam = Camera.main;
-        camBehavior = cam.GetComponent<CameraBehavior>();
+        _cam = Camera.main;
+        _camBehavior = _cam.GetComponent<CameraBehavior>();
 
-        onGenerateMaze += CreateMaze;
-        onGridSliderValueChanged += UpdateSliderText;
-        onZoomSliderValueChanged += HandleZoomSlider;
+        // Actions.
+        _onGenerateMaze += CreateMaze;
+        _onGridSliderValueChanged += UpdateSliderText;
+        _onZoomSliderValueChanged += HandleZoomSlider;
 
-        //UI listeners
-        //buttons
-        generateButton.onClick.AddListener(onGenerateMaze);
-        seeMapButton.onClick.AddListener(SeeMap);
-        seePlayerButton.onClick.AddListener(SeePlayer);
-        //sliders
-        columnsSlider.onValueChanged.AddListener(delegate { onGridSliderValueChanged(columnsSlider, columnsText); });
-        rowsSlider.onValueChanged.AddListener(delegate { onGridSliderValueChanged(rowsSlider, rowsText); });
-        zoomSlider.onValueChanged.AddListener(delegate { onZoomSliderValueChanged(zoomSlider.value); });
+        // UI listeners:
+        // Buttons.
+        _generateButton.onClick.AddListener(_onGenerateMaze);
+        _seeMapButton.onClick.AddListener(SeeMapButtonBehavior);
+        _seePlayerButton.onClick.AddListener(SeePlayerButtonBehavior);
+        // Sliders.
+        _columnsSlider.onValueChanged.AddListener(delegate { _onGridSliderValueChanged(_columnsSlider, _columnsText); });
+        _rowsSlider.onValueChanged.AddListener(delegate { _onGridSliderValueChanged(_rowsSlider, _rowsText); });
+        _zoomSlider.onValueChanged.AddListener(delegate { _onZoomSliderValueChanged(_zoomSlider.value); });
 
 
 
     }
 
-    private void SeeMap()
+    // This function zooms out the camera to see the full maze.
+    private void SeeMapButtonBehavior()
     {
-        zoomSlider.value = zoomSlider.maxValue;
-        camBehavior.CenterAndScaleCamToMaze(mazeRows, mazeColumns);
-        seeMap = true;
+        _zoomSlider.value = _zoomSlider.maxValue;
+        _camBehavior.CenterAndScaleCamToMaze(_mazeGenerator.RowCount, _mazeGenerator.ColumnCount);
+        _seeMap = true;
     }
 
-    private void SeePlayer()
+    // This function is called when the see player button is pressed. zooms the camera in to the player. 
+    private void SeePlayerButtonBehavior()
     {
-        seeMap = false;
-        zoomSlider.value = zoomSlider.minValue;
+        _seeMap = false;
+        _zoomSlider.value = _zoomSlider.minValue;
     }
 
     private void UpdateSliderText(Slider slider, Text text)
@@ -70,18 +76,20 @@ public class UI : MonoBehaviour
         text.text = Mathf.Floor(slider.value).ToString();
     }
 
+    // This function is called when the generate button is pressed.
     private void CreateMaze()
     {
-        tilemap.ClearAllTiles(); //for re-use
-        zoomSlider.value = columnsSlider.minValue; //resets slider, because the cam zooms out.
-        mazeColumns = (int)rowsSlider.value;
-        mazeRows = (int)columnsSlider.value;
-        mazeGenerator.GenerateMaze(mazeRows, mazeColumns);
+        // For re-use.
+        _tilemap.ClearAllTiles();
+        // Resets slider, because cam is centered and scaled to maze.
+        _zoomSlider.value = _columnsSlider.minValue; 
+        _mazeGenerator.GenerateMaze((int)_rowsSlider.value, (int)_columnsSlider.value);
     }
 
+    // This function is called when the zoom slider value is changed. 
     private void HandleZoomSlider(float sliderValue)
     {
-        camBehavior.ZoomBehavior(sliderValue);
+        _camBehavior.ZoomBehavior(sliderValue);
     }
 
 
