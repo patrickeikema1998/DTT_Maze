@@ -123,7 +123,7 @@ public class MazeGenerator : MonoBehaviour
     }
 
 
-    // This function returns a random neighbor.
+    // This function returns a random neighbor of a cell.
     private Cell CheckNextNeighbor(Cell currentCell)
     {
         List<Cell> neighbors = new List<Cell>();
@@ -169,6 +169,9 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
+    // This function setts walls to false to later decide what tiles should be placed.
+    // When a right neighbor is returned, the right wall of the current and the left wall of the next should be set to false.
+    // This way the walls 'break open' and a path is created.
     private void SetWallsToFalse(Cell current, Cell next)
     {
         float columnDifference = current.ColumnNumber - next.ColumnNumber;
@@ -203,7 +206,8 @@ public class MazeGenerator : MonoBehaviour
     }
 
 
-    //this function places the tiles accordingly to the false booleans per cell. 1000 means [true, false, false, false].
+    // This function decides what walls should be placed, determined by the false booleans per cell. 1000 means [true, false, false, false].
+    // Also places the tiles on the tilemap.
     private void DecideAndPlaceTile(Cell cell)
     {
         switch (MakeSuitableForSwitch(cell.Walls))
@@ -273,7 +277,7 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    //boolean arrays are not allowed in switches. This is why the array is calculated into binary.
+    // Boolean arrays are not allowed in switches. This is why the array is calculated into binary.
     private int MakeSuitableForSwitch(bool[] values)
     {
         return (values[0] ? 1 : 0) * 1000 + (values[1] ? 1 : 0) * 100 + (values[2] ? 1 : 0) * 10 + (values[3] ? 1 : 0);
